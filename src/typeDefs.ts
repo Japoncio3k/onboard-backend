@@ -1,6 +1,11 @@
 export const typeDefs = `
+
+interface CommonResponse {
+  message: String!
+  code: String!
+}
+
 type Query {
-  login(userData: LoginInput): LoginResponse!
   hello: String!
 }
 
@@ -11,11 +16,18 @@ input UserInput {
   birthdate: String!
 }
 
-type UserResponse {
-  id:Int!
-  name: String!
-  email: String!
-  birthdate: String! 
+type User {
+  id:Int
+  name: String
+  email: String
+  birthdate: String
+  role: Int
+}
+
+type UserResponse implements CommonResponse {
+  message: String!
+  code: String!
+  user: User
 }
 
 input LoginInput {
@@ -23,17 +35,26 @@ input LoginInput {
   password:String!
 }
 
-type LoginResponse {
+type UserLoginData {
+  id: Int
+  name: String
+  email: String
+  birthdate: String
+}
+
+type LoginData {
   token:String
-  message:String
+  user: UserLoginData
+}
+
+type LoginResponse implements CommonResponse {
+  message: String!
+  code: String!
+  loginData: LoginData
 }
 
 input DeleteUserInput {
   id: Int!
-}
-
-type DefaultUserResponse{
-  message: String!
 }
 
 input UpdateUserInput{
@@ -46,7 +67,8 @@ input UpdateUserInput{
 
 type Mutation {
   createUser(userData: UserInput): UserResponse!
-  deleteUser(userData: DeleteUserInput): DefaultUserResponse!
-  updateUser(userData: UpdateUserInput): DefaultUserResponse!
+  deleteUser(userData: DeleteUserInput): CommonResponse!
+  updateUser(userData: UpdateUserInput): CommonResponse!
+  login(userData: LoginInput): LoginResponse!
 }
 `;

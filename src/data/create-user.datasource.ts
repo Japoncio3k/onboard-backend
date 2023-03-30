@@ -1,4 +1,3 @@
-import { UpdateResult } from 'typeorm';
 import { User } from '../entity/User';
 import { AppDataSource } from './data-source';
 
@@ -14,6 +13,7 @@ interface CreateUserDatasourceResult {
   email: string;
   id: number;
   birthdate: string;
+  role: number;
 }
 
 export const createUserDatasource = async (
@@ -24,11 +24,13 @@ export const createUserDatasource = async (
   user.birthdate = userData.birthdate;
   user.email = userData.email;
   user.password = userData.password;
+  user.role = 0;
   await AppDataSource.manager.save(user);
   return {
     name: user.name,
     birthdate: user.birthdate,
     email: user.email,
     id: user.id,
+    role: 0,
   };
 };

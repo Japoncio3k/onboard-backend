@@ -16,12 +16,12 @@ const startDB = async () => {
 const resolvers = {
   Query: {
     hello: () => `Hello World!`,
-    login: loginUseCase,
   },
   Mutation: {
     createUser: createUserUseCase,
     deleteUser: deleteUserUseCase,
     updateUser: updateUserUseCase,
+    login: loginUseCase,
   },
 };
 
@@ -33,6 +33,9 @@ export const startServer = async () => {
   const server = new ApolloServer({
     typeDefs,
     resolvers,
+    context: ({ req }) => ({
+      authorization: req.headers.authorization,
+    }),
   });
 
   const port = 3000;
