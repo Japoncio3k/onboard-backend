@@ -1,11 +1,11 @@
-import { addHours } from 'date-fns';
-import { sign } from 'jsonwebtoken';
-import { loginDatasource } from '../data/login.datasource';
-import { CommonResponse } from '../model/response.model';
+import { addHours } from "date-fns";
+import { GraphQLError } from "graphql";
+import { sign } from "jsonwebtoken";
+import { loginDatasource } from "../data/login.datasource";
+import { CommonResponse } from "../model/response.model";
 
-interface LoginInput {
-  email: string;
-  password: string;
+export interface LoginInput {
+  userData: { email: string; password: string };
 }
 
 interface UserData {
@@ -15,7 +15,7 @@ interface UserData {
   birthdate: string;
 }
 
-interface LoginSuccessResponse extends CommonResponse {
+interface LoginSuccessResponse {
   loginData: {
     token: string;
     user: UserData;
@@ -24,28 +24,27 @@ interface LoginSuccessResponse extends CommonResponse {
 
 export const loginUseCase = async (
   _: unknown,
-  args: { userData: LoginInput },
-): Promise<LoginSuccessResponse | CommonResponse> => {
+  args: LoginInput
+): Promise<LoginSuccessResponse> => {
   const { userList } = await loginDatasource(args.userData);
 
   if (userList.length > 0) {
     return {
       loginData: {
         token: sign(
-          { createdAt: new Date(), expiresAt: addHours(new Date(), 1), userRole: userList[0].role },
-          'astiydno2mquhzk',
+          {
+            createdAt: new Date(),
+            expiresAt: addHours(new Date(), 1),
+            userRole: userList[0].role,
+          },
+          "astiydno2mquhzk"
         ),
         user: {
           ...userList[0],
         },
       },
-      message: 'Logged in successfully',
-      code: 'success',
     };
   } else {
-    return {
-      code: 'login.incorrectCredentials',
-      message: 'Incorrect credentials',
-    };
+    throw new GraphQLError("Incorrect credentials");
   }
 };

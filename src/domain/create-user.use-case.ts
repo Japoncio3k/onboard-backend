@@ -1,15 +1,7 @@
-import { createUserDatasource } from '../data/create-user.datasource';
-import { CommonResponse } from '../model/response.model';
-import { verifyToken } from '../utils/authentication.util';
-
-interface UserOutput extends CommonResponse {
-  user: {
-    name: string;
-    email: string;
-    id: number;
-    birthdate: string;
-  };
-}
+import { createUserDatasource } from "../data/create-user.datasource";
+import { CommonResponse } from "../model/response.model";
+import { UserOutput } from "../model/user-output.model";
+import { verifyToken } from "../utils/authentication.util";
 
 interface UserInput {
   name: string;
@@ -18,21 +10,19 @@ interface UserInput {
   birthdate: string;
 }
 
-interface CreateUserInput {
+export interface CreateUserInput {
   userData: UserInput;
 }
 
 export const createUserUseCase = async (
   _: unknown,
   args: CreateUserInput,
-  headers: { authorization: string },
-): Promise<UserOutput | CommonResponse> => {
+  headers: { authorization: string }
+): Promise<UserOutput> => {
   return verifyToken<UserOutput>(headers.authorization, async () => {
     const user = await createUserDatasource(args.userData);
     return {
       user,
-      code: 'success',
-      message: 'User created successfully',
     };
   });
 };

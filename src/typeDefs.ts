@@ -1,12 +1,16 @@
 export const typeDefs = `
-
 interface CommonResponse {
   message: String!
-  code: String!
+  code: String
 }
 
 type Query {
   hello: String!
+}
+
+type Response implements CommonResponse {
+  message: String!
+  code: String
 }
 
 input UserInput {
@@ -65,10 +69,19 @@ input UpdateUserInput{
   password: String
 }
 
+input UpsertUserInput{
+  id: Int!
+  name: String!
+  email: String!
+  birthdate: String!
+  password: String!
+}
+
 type Mutation {
   createUser(userData: UserInput): UserResponse!
-  deleteUser(userData: DeleteUserInput): CommonResponse!
-  updateUser(userData: UpdateUserInput): CommonResponse!
+  deleteUser(userData: DeleteUserInput): Response!
+  updateUser(userData: UpdateUserInput): Response!
   login(userData: LoginInput): LoginResponse!
+  upsertUser(userData: UpsertUserInput): Response!
 }
 `;

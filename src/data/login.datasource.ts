@@ -1,17 +1,21 @@
-import { User } from '../entity/User';
-import { AppDataSource } from './data-source';
+import { User } from "../entity/User";
+import { LoginResponse } from "../model/login.model";
+import { AppDataSource } from "./data-source";
+import { mapUserList } from "./user-list.mapper";
 
 interface LoginDatasourceInput {
   email: string;
   password: string;
 }
 
-interface LoginDatasourceResponse {
-  userList: User[];
-}
-
-export const loginDatasource = async (userData: LoginDatasourceInput): Promise<LoginDatasourceResponse> => {
+export const loginDatasource = async (
+  userData: LoginDatasourceInput
+): Promise<LoginResponse> => {
   const userRepo = AppDataSource.getRepository(User);
-  const userList = await userRepo.findBy({ email: userData.email, password: userData.password });
-  return { userList };
+  const userList = await userRepo.findBy({
+    email: userData.email,
+    password: userData.password,
+  });
+
+  return { userList: mapUserList(userList) };
 };

@@ -1,5 +1,8 @@
-import { User } from '../entity/User';
-import { AppDataSource } from './data-source';
+import { GraphQLError } from "graphql";
+import { User } from "../entity/User";
+import { Roles } from "../model/roles.model";
+import { UserModel } from "../model/user.model";
+import { AppDataSource } from "./data-source";
 
 interface CreateUserDatasourceInput {
   name: string;
@@ -8,29 +11,21 @@ interface CreateUserDatasourceInput {
   birthdate: string;
 }
 
-interface CreateUserDatasourceResult {
-  name: string;
-  email: string;
-  id: number;
-  birthdate: string;
-  role: number;
-}
-
 export const createUserDatasource = async (
-  userData: CreateUserDatasourceInput,
-): Promise<CreateUserDatasourceResult> => {
+  userData: CreateUserDatasourceInput
+): Promise<UserModel> => {
   const user = new User();
   user.name = userData.name;
   user.birthdate = userData.birthdate;
   user.email = userData.email;
   user.password = userData.password;
-  user.role = 0;
+  user.role = Roles.Common;
   await AppDataSource.manager.save(user);
   return {
     name: user.name,
     birthdate: user.birthdate,
     email: user.email,
     id: user.id,
-    role: 0,
+    role: Roles.Common,
   };
 };

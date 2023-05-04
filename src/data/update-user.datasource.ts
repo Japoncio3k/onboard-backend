@@ -1,5 +1,5 @@
-import { User } from '../entity/User';
-import { AppDataSource } from './data-source';
+import { User } from "../entity/User";
+import { AppDataSource } from "./data-source";
 
 interface UpdateUserDatasourceInput {
   id: number;
@@ -9,7 +9,9 @@ interface UpdateUserDatasourceInput {
   name?: string;
 }
 
-export const updateUserDatasource = async (userData: UpdateUserDatasourceInput) => {
+export const updateUserDatasource = async (
+  userData: UpdateUserDatasourceInput
+) => {
   const userRepo = AppDataSource.getRepository(User);
-  await userRepo.update({ id: userData.id }, userData);
+  return await userRepo.update({ id: userData.id }, userData);
 };

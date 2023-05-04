@@ -1,29 +1,31 @@
-import { isAfter, isBefore } from 'date-fns';
-import { verify } from 'jsonwebtoken';
-import { CommonResponse } from '../model/response.model';
+import { isAfter } from "date-fns";
+import { GraphQLError } from "graphql";
+import { verify } from "jsonwebtoken";
+import { Roles } from "../model/roles.model";
+import { TokenModel } from "../model/token.model";
 
 export const verifyToken = <Response>(
   token: string,
-  success: () => Promise<Response>,
-): Promise<Response> | CommonResponse => {
+  success: () => Promise<Response>
+): Promise<Response> => {
   if (!token) {
-    return {
-      message: 'You have to be authenticated to perform this action',
-      code: 'unauthenticated',
-    };
+    throw new GraphQLError(
+      "You have to be authenticated to perform this action"
+    );
   }
-  const decoded = verify(token, 'astiydno2mquhzk');
-  if (isAfter(new Date(), (<any>decoded).expiresAt)) {
-    return {
-      message: 'Authorization token expired',
-      code: 'expired',
-    };
-  } else if ((<any>decoded).userRole === 1) {
+
+  let decoded;
+  try {
+    decoded = verify(token, "astiydno2mquhzk");
+  } catch (error) {
+    throw new GraphQLError("Invalid Token");
+  }
+
+  if (isAfter(new Date(), (<TokenModel>decoded).expiresAt)) {
+    throw new GraphQLError("Authorization token expired");
+  } else if ((<TokenModel>decoded).userRole === Roles.Admin) {
     return success();
   } else {
-    return {
-      message: 'Unauthorized',
-      code: 'unauthorized',
-    };
+    throw new GraphQLError("Unauthorized");
   }
 };
