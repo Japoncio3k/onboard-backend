@@ -1,7 +1,7 @@
 import { createUserDatasource } from "../data/create-user.datasource";
-import { CommonResponse } from "../model/response.model";
-import { UserOutput } from "../model/user-output.model";
-import { verifyToken } from "../utils/authentication.util";
+import { AppError } from "../model/error.model";
+import { UserModel } from "../model/user.model";
+import { verifyToken } from "../utils/verify-token.util";
 
 interface UserInput {
   name: string;
@@ -15,14 +15,15 @@ export interface CreateUserInput {
 }
 
 export const createUserUseCase = async (
-  _: unknown,
   args: CreateUserInput,
-  headers: { authorization: string }
-): Promise<UserOutput> => {
-  return verifyToken<UserOutput>(headers.authorization, async () => {
-    const user = await createUserDatasource(args.userData);
+  authorization: string
+): Promise<UserModel | AppError> => {
+  const tokenResponse = verifyToken(authorization);
+  if (tokenResponse.success) {
+    return await createUserDatasource(args.userData);
+  } else {
     return {
-      user,
+      message: tokenResponse.message,
     };
-  });
+  }
 };

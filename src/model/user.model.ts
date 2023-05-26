@@ -1,9 +1,11 @@
 import { Roles } from "./roles.model";
 
 export interface UserModel {
-  name: string;
-  email: string;
+  userData: {
+    birthdate: string;
+    name: string;
+    email: string;
+    role: Roles;
+  };
   id: number;
-  birthdate: string;
-  role: Roles;
 }

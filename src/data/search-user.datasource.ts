@@ -1,13 +1,22 @@
 import { User } from "../entity/User";
 import { AppDataSource } from "./data-source";
+import { mapUser } from "./user.mapper";
 
 interface SearchUserDatasourceInput {
-  id: number;
+  id?: number;
+  email?: string;
 }
 
 export const searchUserDatasource = async (
   userData: SearchUserDatasourceInput
 ) => {
   const userRepo = AppDataSource.getRepository(User);
-  return await userRepo.findBy({ id: userData.id });
+  const user = await userRepo.findOneBy({
+    id: userData.id,
+    email: userData.email,
+  });
+  if (user) {
+    return mapUser(user);
+  }
+  return null;
 };

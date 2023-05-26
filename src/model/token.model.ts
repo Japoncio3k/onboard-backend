@@ -1,7 +1,8 @@
 import { Roles } from "./roles.model";
+import { UserModel } from "./user.model";
 
 export interface TokenModel {
   createdAt: Date;
-  expiresAt: Date;
-  userRole: Roles;
+  expiresAt: string;
+  user: UserModel;
 }

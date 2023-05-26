@@ -1,7 +1,12 @@
 export const typeDefs = `
 interface CommonResponse {
-  message: String!
+  message: String
   code: String
+}
+
+enum UpsertUserActions {
+  Create
+  Update
 }
 
 type Query {
@@ -9,7 +14,7 @@ type Query {
 }
 
 type Response implements CommonResponse {
-  message: String!
+  message: String
   code: String
 }
 
@@ -20,17 +25,21 @@ input UserInput {
   birthdate: String!
 }
 
+type UserData {
+  name: String!
+  email: String!
+  birthdate: String!
+  role: String!
+}
+
 type User {
   id:Int
-  name: String
-  email: String
-  birthdate: String
-  role: Int
+  userData: UserData
 }
 
 type UserResponse implements CommonResponse {
-  message: String!
-  code: String!
+  message: String
+  code: String
   user: User
 }
 
@@ -52,8 +61,8 @@ type LoginData {
 }
 
 type LoginResponse implements CommonResponse {
-  message: String!
-  code: String!
+  message: String
+  code: String
   loginData: LoginData
 }
 
@@ -63,25 +72,26 @@ input DeleteUserInput {
 
 input UpdateUserInput{
   id: Int!
-  name: String
-  email: String
-  birthdate: String
-  password: String
+  userData: UserInput
 }
 
 input UpsertUserInput{
   id: Int!
-  name: String!
-  email: String!
-  birthdate: String!
-  password: String!
+  userData: UserInput
+}
+
+type UpsertUserResponse implements CommonResponse {
+  message: String
+  code: String
+  data: User
+  action: UpsertUserActions
 }
 
 type Mutation {
-  createUser(userData: UserInput): UserResponse!
-  deleteUser(userData: DeleteUserInput): Response!
-  updateUser(userData: UpdateUserInput): Response!
-  login(userData: LoginInput): LoginResponse!
-  upsertUser(userData: UpsertUserInput): Response!
+  createUser(userData: UserInput): UserResponse
+  deleteUser(userData: DeleteUserInput): Response
+  updateUser(userData: UpdateUserInput): Response
+  login(userData: LoginInput): LoginResponse
+  upsertUser(userData: UpsertUserInput): UpsertUserResponse
 }
 `;

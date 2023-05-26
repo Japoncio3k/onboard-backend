@@ -3,6 +3,7 @@ import { User } from "../entity/User";
 import { Roles } from "../model/roles.model";
 import { UserModel } from "../model/user.model";
 import { AppDataSource } from "./data-source";
+import { mapUser } from "./user.mapper";
 
 interface CreateUserDatasourceInput {
   name: string;
@@ -21,11 +22,5 @@ export const createUserDatasource = async (
   user.password = userData.password;
   user.role = Roles.Common;
   await AppDataSource.manager.save(user);
-  return {
-    name: user.name,
-    birthdate: user.birthdate,
-    email: user.email,
-    id: user.id,
-    role: Roles.Common,
-  };
+  return mapUser(user);
 };

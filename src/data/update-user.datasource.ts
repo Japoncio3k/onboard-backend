@@ -3,15 +3,15 @@ import { AppDataSource } from "./data-source";
 
 interface UpdateUserDatasourceInput {
   id: number;
-  email?: string;
-  password?: string;
-  birthdate?: string;
-  name?: string;
+  userData: {
+    email?: string;
+    password?: string;
+    birthdate?: string;
+    name?: string;
+  };
 }
 
-export const updateUserDatasource = async (
-  userData: UpdateUserDatasourceInput
-) => {
+export const updateUserDatasource = async (user: UpdateUserDatasourceInput) => {
   const userRepo = AppDataSource.getRepository(User);
-  return await userRepo.update({ id: userData.id }, userData);
+  return await userRepo.update({ id: user.id }, { ...user.userData });
 };

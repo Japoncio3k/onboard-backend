@@ -1,9 +1,11 @@
+import { GraphQLError } from "graphql";
 import { UpdateResult } from "typeorm";
 import { createUserDatasource } from "../data/create-user.datasource";
 import { searchUserDatasource } from "../data/search-user.datasource";
 import { updateUserDatasource } from "../data/update-user.datasource";
-import { UserOutput } from "../model/user-output.model";
-import { verifyToken } from "../utils/authentication.util";
+import { AppError } from "../model/error.model";
+import { UserModel } from "../model/user.model";
+import { verifyToken } from "../utils/verify-token.util";
 
 export enum UpsertUserActions {
   Create = "Create",
@@ -13,36 +15,47 @@ export enum UpsertUserActions {
 export interface UpsertUserInput {
   userData: {
     id: number;
-    email: string;
-    password: string;
-    birthdate: string;
-    name: string;
+    userData: {
+      email: string;
+      password: string;
+      birthdate: string;
+      name: string;
+    };
   };
 }
 
 interface UpsertUserResult {
-  data: UpdateResult | UserOutput;
+  data: UpdateResult | UserModel;
   action: UpsertUserActions;
 }
 
 export const upsertUserUseCase = async (
-  _: unknown,
-  args: UpsertUserInput,
-  headers: { authorization: string }
-): Promise<UpsertUserResult> => {
-  return verifyToken(headers.authorization, async () => {
-    const users = await searchUserDatasource({ id: args.userData.id });
-    if (users.length === 0) {
-      const user = await createUserDatasource(args.userData);
+  userInput: UpsertUserInput,
+  authorization: string
+): Promise<UpsertUserResult | AppError> => {
+  const tokenResponse = verifyToken(authorization);
+  if (tokenResponse.success) {
+    const user = await searchUserDatasource({ id: userInput.userData.id });
+    if (!user) {
+      const createdUser = await createUserDatasource(
+        userInput.userData.userData
+      );
       return {
-        data: { user },
+        data: createdUser,
         action: UpsertUserActions.Create,
       };
     } else {
+      const updatedUser = (await searchUserDatasource({
+        id: userInput.userData.id,
+      })) as UserModel;
       return {
-        data: await updateUserDatasource(args.userData),
+        data: updatedUser,
         action: UpsertUserActions.Update,
       };
     }
-  });
+  } else {
+    return {
+      message: tokenResponse.message,
+    };
+  }
 };
